@@ -11,12 +11,13 @@ body {
     background: #eef3ff;
 }
 .container {
-    max-width: 500px;
+    max-width: 600px;
     margin: auto;
     background: white;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 button {
     padding: 12px 20px;
@@ -29,6 +30,16 @@ button {
     color: white;
 }
 .hidden { display: none; }
+.list-box {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 14px;
+    background:#f0f4ff;
+    padding:10px;
+    border-radius:8px;
+    max-height:150px;
+    overflow:auto;
+}
 </style>
 </head>
 <body>
@@ -58,6 +69,104 @@ button {
     <button onclick="restart()">Play Again</button>
 </div>
 
-<script src="script.js"></script>
+<div class="container">
+    <h3>Players this session:</h3>
+    <div class="list-box" id="playersList">No players yet.</div>
+
+    <h3>Recent Winners:</h3>
+    <div class="list-box" id="winnersList">No winners yet.</div>
+</div>
+
+<script>
+/* ===== Session Storage Lists ===== */
+if(!sessionStorage.getItem('players')) sessionStorage.setItem('players', JSON.stringify([]));
+if(!sessionStorage.getItem('winners')) sessionStorage.setItem('winners', JSON.stringify([]));
+
+function updateLists() {
+    const players = JSON.parse(sessionStorage.getItem('players'));
+    const winners = JSON.parse(sessionStorage.getItem('winners'));
+
+    document.getElementById('playersList').innerHTML =
+        players.length ? players.map(p=>'• '+p).join('<br>') : 'No players yet.';
+
+    document.getElementById('winnersList').innerHTML =
+        winners.length ? winners.map(w=>'• '+w.name+' — Score: '+w.score+'/3').join('<br>') : 'No winners yet.';
+}
+
+/* ===== Game Variables ===== */
+let player = "";
+let round = 1;
+let score = 0;
+const totalRounds = 3;
+
+/* ===== Start Game ===== */
+function startGame() {
+    player = document.getElementById("playerName").value.trim();
+    if (!player) return alert("Enter your BGMI name!");
+
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("gameBox").classList.remove("hidden");
+    document.getElementById("welcomeText").innerText = `Welcome, ${player}`;
+
+    // Add to session players
+    let players = JSON.parse(sessionStorage.getItem('players'));
+    if(!players.includes(player)) {
+        players.push(player);
+        sessionStorage.setItem('players', JSON.stringify(players));
+    }
+    updateLists();
+}
+
+/* ===== Play Function ===== */
+function play(move) {
+    const choices = ["rock","paper","scissor"];
+    const bot = choices[Math.floor(Math.random()*3)];
+    let resultText = "";
+
+    if(move===bot) resultText="Draw!";
+    else if(
+        (move==="rock" && bot==="scissor") ||
+        (move==="paper" && bot==="rock") ||
+        (move==="scissor" && bot==="paper")
+    ) { resultText="You Win!"; score++; }
+    else resultText="You Lose!";
+
+    document.getElementById("result").innerText = `You: ${move} | Bot: ${bot} → ${resultText}`;
+    document.getElementById("score").innerText = score;
+
+    if(round===totalRounds){
+        endGame();
+    } else {
+        round++;
+        document.getElementById("round").innerText = round;
+    }
+}
+
+/* ===== End Game ===== */
+function endGame() {
+    document.getElementById("gameBox").classList.add("hidden");
+    document.getElementById("finalBox").classList.remove("hidden");
+
+    const final = score>=2 ? "🏆 You Won the Match!" : "❌ You Lost the Match";
+    document.getElementById("finalResult").innerText = `${player}, your score: ${score}/3 — ${final}`;
+
+    // Add winner to session if player won
+    if(score>=2){
+        let winners = JSON.parse(sessionStorage.getItem('winners'));
+        winners.push({name: player, score: score});
+        sessionStorage.setItem('winners', JSON.stringify(winners));
+        updateLists();
+    }
+}
+
+/* ===== Restart Game ===== */
+function restart(){
+    round=1; score=0;
+    document.getElementById("round").innerText=round;
+    document.getElementById("score").innerText=score;
+    document.getElementById("finalBox").classList.add("hidden");
+    document.getElementById("gameBox").classList.remove("hidden");
+}
+</script>
 </body>
 </html>
