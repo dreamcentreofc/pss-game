@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BGMI Paper Scissor Stone</title>
+<style>
+body {
+    font-family: Poppins, sans-serif;
+    text-align: center;
+    padding: 30px;
+    background: #eef3ff;
+}
+.container {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+button {
+    padding: 12px 20px;
+    margin: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #2b6ef6;
+    color: white;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container" id="loginBox">
+    <h2>Enter Your BGMI Name</h2>
+    <input id="playerName" placeholder="BGMI IGN" style="padding:10px;width:90%;font-size:16px;">
+    <br><br>
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<div class="container hidden" id="gameBox">
+    <h2 id="welcomeText"></h2>
+    <h3>Round: <span id="round">1</span> / 3</h3>
+
+    <button onclick="play('rock')">🪨 Rock</button>
+    <button onclick="play('paper')">📄 Paper</button>
+    <button onclick="play('scissor')">✂️ Scissor</button>
+
+    <h3 id="result"></h3>
+    <h3>Score: <span id="score">0</span></h3>
+</div>
+
+<div class="container hidden" id="finalBox">
+    <h2>Game Finished</h2>
+    <h3 id="finalResult"></h3>
+    <button onclick="restart()">Play Again</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
